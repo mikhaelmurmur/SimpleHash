@@ -1,25 +1,25 @@
 #include <NTL/ZZ.h>
 #include "filereader.h"
-#include "encryption.h"
 #include "generalhelpers.h"
+#include "hashing.h"
+
 
 int main()
 {
     std::vector<char> fileData;
 
-    if(!CryptoHelpers::ReadFile("main.cpp", fileData))
+    if(!CryptoHelpers::ReadFile("test.txt1", fileData))
     {
         return 1;
     }
 
     std::vector<NTL::ZZ> data;
     CryptoHelpers::ConvertByteToLong(fileData, data);
-    NTL::ZZ encryptedData(1);
-    for(auto& _data: data)
-    {
-        CryptoHelpers::Encrypt(_data, encryptedData);
 
-        std::cout << encryptedData << '\n';
-    }
+    NTL::ZZ hashValue;
+
+    CryptoHelpers::Hash(data, hashValue);
+
+    std::cout << hashValue << '\n';
     std::cin.get();
 }

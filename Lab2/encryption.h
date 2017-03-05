@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 namespace NTL {
     class ZZ;
@@ -6,8 +7,7 @@ namespace NTL {
 
 namespace CryptoHelpers
 {
-
-    void Encrypt(const NTL::ZZ& source, NTL::ZZ& target);
+    void Encrypt(const NTL::ZZ& source, NTL::ZZ& target,const NTL::ZZ* key = nullptr);
 
     void ResetKey();
 }

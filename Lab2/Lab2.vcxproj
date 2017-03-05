@@ -149,6 +149,7 @@
     <ClCompile Include="encryption.cpp" />
     <ClCompile Include="filereader.cpp" />
     <ClCompile Include="generalhelpers.cpp" />
+    <ClCompile Include="hashing.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
     <ClInclude Include="encryption.h" />
     <ClInclude Include="filereader.h" />
     <ClInclude Include="generalhelpers.h" />
+    <ClInclude Include="hashing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
