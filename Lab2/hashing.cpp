@@ -8,7 +8,20 @@ namespace CryptoHelpers
     {
         hashValue = 0;
 
-        for(auto& chunk: source)
+        for(const auto& chunk: source)
+        {
+            //auto newKey = hashValue^chunk;
+            auto currentHash = hashValue;
+            Encrypt(currentHash, hashValue, &(hashValue^chunk));
+            hashValue ^= currentHash;
+        }
+    }
+
+    void Hash(const std::vector<unsigned long long>& source, unsigned long long& hashValue)
+    {
+        hashValue = 0;
+
+        for (const auto& chunk : source)
         {
             auto newKey = hashValue^chunk;
             auto currentHash = hashValue;

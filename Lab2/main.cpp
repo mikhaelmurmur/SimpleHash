@@ -8,15 +8,15 @@ int main()
 {
     std::vector<char> fileData;
 
-    if(!CryptoHelpers::ReadFile("test.txt1", fileData))
+    if(!CryptoHelpers::ReadFile("Lab2.VC.db", fileData))
     {
         return 1;
     }
 
-    std::vector<NTL::ZZ> data;
+    std::vector<unsigned long long> data; 
     CryptoHelpers::ConvertByteToLong(fileData, data);
 
-    NTL::ZZ hashValue;
+    unsigned long long hashValue;
 
     CryptoHelpers::Hash(data, hashValue);
 
