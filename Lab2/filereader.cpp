@@ -26,29 +26,5 @@ namespace CryptoHelpers
         return true;
     }
 
-    void ConvertByteToLong(const std::vector<char>& source, std::vector<NTL::ZZ>& target)
-    {
-        target.resize(std::ceil(source.size() / LONG_BYTE_LENGTH));
-
-        if(target.size()==0)
-        {
-            target.resize(1);//dirty hack
-        }
-        auto targetIndex = 0;
-        auto it = target.begin();
-        (*it) = 0;
-        for (const auto& byte : source)
-        {
-            ++targetIndex;
-
-            (*it) <<= 8;
-            (*it) += byte;
-
-            if (targetIndex > 7)
-            {
-                ++it;
-                (*it) = 0;
-            }
-        }
-    }
+    
 }

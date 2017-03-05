@@ -5,7 +5,6 @@ namespace CryptoHelpers
     const auto LONG_BIT_LENGTH = 64;
     const auto LONG_BYTE_LENGTH = 8;
 
-
     const std::vector<int> SBOX = {
         //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
         0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76, //0

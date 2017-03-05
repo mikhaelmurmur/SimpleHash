@@ -1,12 +1,13 @@
 #include <NTL/ZZ.h>
 #include "filereader.h"
 #include "encryption.h"
+#include "generalhelpers.h"
 
 int main()
 {
     std::vector<char> fileData;
 
-    if(!CryptoHelpers::ReadFile("test.txt1", fileData))
+    if(!CryptoHelpers::ReadFile("main.cpp", fileData))
     {
         return 1;
     }
@@ -14,8 +15,11 @@ int main()
     std::vector<NTL::ZZ> data;
     CryptoHelpers::ConvertByteToLong(fileData, data);
     NTL::ZZ encryptedData(1);
-    CryptoHelpers::Encrypt(data[0], encryptedData);
+    for(auto& _data: data)
+    {
+        CryptoHelpers::Encrypt(_data, encryptedData);
 
-    std::cout << encryptedData << '\n';
+        std::cout << encryptedData << '\n';
+    }
     std::cin.get();
 }
