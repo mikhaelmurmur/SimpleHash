@@ -1,6 +1,7 @@
-#include <NTL/GF2.h>
+#include <NTL/ZZ.h>
 #include <vector>
 #include "constants.h"
+#include "generalhelpers.h"
 
 namespace CryptoHelpers
 {
@@ -18,10 +19,11 @@ namespace CryptoHelpers
             NTL::BytesFromZZ(&byte, (input >> (8 * byteIndex)) & 0xFF, 1);
             newRightHalf |= SBOX[byte] << (8 * byteIndex);
         }
-        auto shift = newRightHalf & 0xFFF80000;
+        auto shift = (newRightHalf>>4) & 0xFFF8000;
+        shift <<= 4;
         newRightHalf <<= 13;
         newRightHalf |= shift;
-        newRightHalf &= 0xFFFFFFFF;
+        newRightHalf = And32Bits(newRightHalf);
 
         input = 0;
         input |= newRightHalf;
@@ -34,18 +36,18 @@ namespace CryptoHelpers
         rand.get(randomValue.data(), 8);
         NTL::ZZ key(0);
         NTL::ZZFromBytes(key, randomValue.data(),8);
-        g_roundKeys[0] = key & 0xFFFFFFFF;
-        g_roundKeys[1] = (key >> 32) & 0xFFFFFFFF;
-        g_roundKeys[2] = g_roundKeys[0]^0xFFFFFFFF;
-        g_roundKeys[3] = g_roundKeys[1] ^ 0xFFFFFFFF;
+        g_roundKeys[0] = And32Bits(key);
+        g_roundKeys[1] = And32Bits(key >> 32);
+        g_roundKeys[2] = Xor32Bits(g_roundKeys[0]);
+        g_roundKeys[3] = Xor32Bits(g_roundKeys[1]);
     }
 
     void Encrypt(const NTL::ZZ & source, NTL::ZZ & target)
     {
         GenerateKeys();
-        auto rightHalf = source & 0xFFFFFFFF;
-        auto leftHalf = (source >> 32) & 0xFFFFFFFF;
-
+        auto rightHalf = And32Bits(source);
+        auto leftHalf = And32Bits(source >> 32);
+        target = 0;
         for(auto roundIndex = 0u;roundIndex<4;++roundIndex)
         {
             RoundFunction(rightHalf, g_roundKeys[roundIndex]);
