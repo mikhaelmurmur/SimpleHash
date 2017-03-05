@@ -29,22 +29,32 @@ namespace CryptoHelpers
         input |= newRightHalf;
     }
 
-    void GenerateKeys()
+    void GenerateRoundKeys(const NTL::ZZ& key)
     {
-        auto rand = NTL::GetCurrentRandomStream();
-        std::vector<unsigned char> randomValue(8);
-        rand.get(randomValue.data(), 8);
-        NTL::ZZ key(0);
-        NTL::ZZFromBytes(key, randomValue.data(),8);
         g_roundKeys[0] = And32Bits(key);
         g_roundKeys[1] = And32Bits(key >> 32);
         g_roundKeys[2] = Xor32Bits(g_roundKeys[0]);
         g_roundKeys[3] = Xor32Bits(g_roundKeys[1]);
     }
 
-    void Encrypt(const NTL::ZZ & source, NTL::ZZ & target)
+    void GenerateKeys(const NTL::ZZ* _key = nullptr)
     {
-        GenerateKeys();
+        if (!_key)
+        {
+            auto rand = NTL::GetCurrentRandomStream();
+            std::vector<unsigned char> randomValue(8);
+            rand.get(randomValue.data(), 8);
+            NTL::ZZ key(0);
+            NTL::ZZFromBytes(key, randomValue.data(), 8);
+            GenerateRoundKeys(key);
+            return;
+        }
+        GenerateRoundKeys(*_key);
+    }
+
+    void Encrypt(const NTL::ZZ & source, NTL::ZZ & target, const NTL::ZZ* key = nullptr)
+    {
+        GenerateKeys(key);
         auto rightHalf = And32Bits(source);
         auto leftHalf = And32Bits(source >> 32);
         target = 0;
