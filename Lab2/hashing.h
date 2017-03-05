@@ -8,4 +8,5 @@ namespace NTL {
 namespace CryptoHelpers
 {
     void Hash(const std::vector<NTL::ZZ>& source, NTL::ZZ& hashValue);
+    void Hash(const std::vector<unsigned long long>& source, unsigned long long& hashValue);
 }
