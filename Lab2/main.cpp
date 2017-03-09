@@ -8,11 +8,11 @@ int main()
 {
     std::vector<char> fileData;
 
-    if(!CryptoHelpers::ReadFile("Lab2.VC.db", fileData))
+    if(!CryptoHelpers::ReadFile("main.cpp", fileData))
     {
         return 1;
     }
-
+    
     std::vector<unsigned long long> data; 
     CryptoHelpers::ConvertByteToLong(fileData, data);
 

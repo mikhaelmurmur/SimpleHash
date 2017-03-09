@@ -42,6 +42,14 @@ namespace CryptoHelpers
             *it <<= 8;
             *it += source[byteIndex];
         }
+
+        if(source.size()%LONG_BYTE_LENGTH!=0)//padding
+        {
+            auto diff = source.size() % LONG_BYTE_LENGTH;
+            target[target.size() - 1] <<= 1;
+            target[target.size() - 1] |= 1;
+            target[target.size() - 1] <<= (8*(8-diff)-1);
+        }
     }
 
     NTL::ZZ And32Bits(const NTL::ZZ& target)
