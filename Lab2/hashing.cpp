@@ -10,9 +10,9 @@ namespace CryptoHelpers
 
         for(const auto& chunk: source)
         {
-            //auto newKey = hashValue^chunk;
+            auto newKey = hashValue^chunk;
             auto currentHash = hashValue;
-            Encrypt(currentHash, hashValue, &(hashValue^chunk));
+            Encrypt(currentHash, hashValue, &newKey);
             hashValue ^= currentHash;
         }
     }
