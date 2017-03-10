@@ -20,6 +20,6 @@ int main()
 
     CryptoHelpers::Hash(data, hashValue);
 
-    std::cout << hashValue << '\n';
+    std::cout <<std::hex<< hashValue << '\n';
     std::cin.get();
 }

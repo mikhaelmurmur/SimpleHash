@@ -8,6 +8,19 @@ namespace CryptoHelpers
     std::vector<NTL::ZZ> g_roundKeys(4);
     std::vector<unsigned long long> g_roundKeysInt(4);
 
+    void ReverseBytes(int bytesNumber,unsigned long long& value)
+    {
+        auto newValue = 0ull;
+        for (int i = 0; i<bytesNumber; ++i)
+        {
+            newValue <<= 8;
+            newValue |= value & 0xFF;
+            value >>= 8;
+        }
+        value = newValue;
+    }
+
+
     void RoundFunction(NTL::ZZ& input, const NTL::ZZ& key)
     {
         input ^= key;
@@ -20,7 +33,7 @@ namespace CryptoHelpers
             NTL::BytesFromZZ(&byte, (input >> (8 * byteIndex)) & 0xFF, 1);
             newRightHalf |= SBOX[byte] << (8 * byteIndex);
         }
-        auto shift = (newRightHalf>>4) & 0xFFF8000;
+        auto shift = (newRightHalf >> 4) & 0xFFF8000;
         shift <<= 4;
         newRightHalf <<= 13;
         newRightHalf |= shift;
@@ -30,24 +43,38 @@ namespace CryptoHelpers
         input |= newRightHalf;
     }
 
-    void RoundFunction(unsigned long long& _input, const unsigned long long& key)
+    template <typename T>
+    T reverse(T n, size_t b = sizeof(T) * 8)
     {
-        auto input =_input^ key;
+        //        assert(b <= std::numeric_limits<T>::digits);
+
+        T rv = 0;
+
+        for (size_t i = 0; i < b; ++i, n >>= 1)
+            rv = (rv >> 1) | (n & 0x01);
+
+        return rv;
+    }
+
+    void RoundFunction(const unsigned long long& _input, const unsigned long long& key, unsigned long long& result, bool b = true)
+    {
+        auto input = _input ^ key;
 
         unsigned long long newRightHalf(0);
 
         for (auto byteIndex = 0u; byteIndex < 4; ++byteIndex)
         {
-            newRightHalf |= SBOX[(_input >> (8 * byteIndex)) & 0xFF] << (8 * byteIndex);
+            //newRightHalf <<= 8;
+            newRightHalf |= SBOX[(input >> (8 * byteIndex)) & 0xFF] << (8 * byteIndex);
         }
-        auto shift = (newRightHalf >> 4) & 0xFFF8000;
-        shift <<= 4;
+
+        auto shift = newRightHalf & 0xFFF80000;
+        shift >>= 19;
         newRightHalf <<= 13;
         newRightHalf |= shift;
-        newRightHalf = (newRightHalf)& 0xFFFFFFFF;
+        newRightHalf = (newRightHalf) & 0xFFFFFFFF;
 
-        _input = 0;
-        _input |= newRightHalf;
+        result = newRightHalf;
     }
 
     void GenerateRoundKeys(const NTL::ZZ& key)
@@ -60,10 +87,12 @@ namespace CryptoHelpers
 
     void GenerateRoundKeys(const unsigned long long& key)
     {
-        g_roundKeysInt[0] = key& 0xFFFFFFFF;
-        g_roundKeysInt[1] = (key >> 32)& 0xFFFFFFF;
-        g_roundKeysInt[2] = !(g_roundKeysInt[0]);
-        g_roundKeysInt[3] = !(g_roundKeysInt[1]);
+        g_roundKeysInt[0] = (key >> 32) & 0xFFFFFFFF;
+        g_roundKeysInt[1] = key & 0xFFFFFFFF;
+        ReverseBytes(4,g_roundKeysInt[0]);
+        ReverseBytes(4,g_roundKeysInt[1]);
+        g_roundKeysInt[2] = (g_roundKeysInt[1] ^ 0xFFFFFFFF);
+        g_roundKeysInt[3] = (g_roundKeysInt[0] ^ 0xFFFFFFFF);
     }
 
     void GenerateKeys(const NTL::ZZ* _key = nullptr)
@@ -102,7 +131,7 @@ namespace CryptoHelpers
         auto rightHalf = And32Bits(source);
         auto leftHalf = And32Bits(source >> 32);
         target = 0;
-        for(auto roundIndex = 0u;roundIndex<4;++roundIndex)
+        for (auto roundIndex = 0u; roundIndex < 4; ++roundIndex)
         {
             RoundFunction(rightHalf, g_roundKeys[roundIndex]);
             rightHalf ^= leftHalf;
@@ -118,29 +147,37 @@ namespace CryptoHelpers
 
     void ResetKey()
     {
-        for(auto& key : g_roundKeys)
+        for (auto& key : g_roundKeys)
         {
             key = 0;
         }
     }
 
+    
     void Encrypt(const unsigned long long& source, unsigned long long& target, const unsigned long long* key = nullptr)
     {
         GenerateKeys(key);
-        auto rightHalf = source & 0xFFFFFFFF;
-        auto leftHalf = (source >> 32) & 0xFFFFFFFF;
+
+        auto rightHalf = (source>>32) & 0xFFFFFFFF;
+        auto leftHalf = source & 0xFFFFFFFF;
+        ReverseBytes(4, rightHalf);
+        ReverseBytes(4, leftHalf);
+        std::swap(rightHalf, leftHalf);
         target = 0;
-        for (auto roundIndex = 0u; roundIndex<4; ++roundIndex)
+        for (auto roundIndex = 0u; roundIndex < 4; ++roundIndex)
         {
-            RoundFunction(rightHalf, g_roundKeysInt[roundIndex]);
-            rightHalf ^= leftHalf;
-            std::swap(rightHalf, leftHalf);
+            auto tmp = 0ull;
+            RoundFunction(rightHalf, g_roundKeysInt[roundIndex], tmp);
+            tmp ^= leftHalf;
+            rightHalf = leftHalf;
+            leftHalf = tmp;
         }
 
         std::swap(rightHalf, leftHalf);
 
-        target |= rightHalf;
-        target |= leftHalf << 32;
+        target |= rightHalf<<32;
+        target |= leftHalf;
+        ReverseBytes(8,target);
     }
 
 }

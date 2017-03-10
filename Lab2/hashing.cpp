@@ -26,6 +26,7 @@ namespace CryptoHelpers
             auto newKey = hashValue^chunk;
             auto currentHash = hashValue;
             Encrypt(currentHash, hashValue, &newKey);
+            
             hashValue ^= currentHash;
         }
     }
