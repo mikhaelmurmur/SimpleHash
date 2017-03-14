@@ -30,6 +30,9 @@
     <ClCompile Include="hashing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="signing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filereader.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hashing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="signing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

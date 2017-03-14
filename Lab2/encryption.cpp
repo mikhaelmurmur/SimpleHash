@@ -8,19 +8,6 @@ namespace CryptoHelpers
     std::vector<NTL::ZZ> g_roundKeys(4);
     std::vector<unsigned long long> g_roundKeysInt(4);
 
-    void ReverseBytes(int bytesNumber,unsigned long long& value)
-    {
-        auto newValue = 0ull;
-        for (int i = 0; i<bytesNumber; ++i)
-        {
-            newValue <<= 8;
-            newValue |= value & 0xFF;
-            value >>= 8;
-        }
-        value = newValue;
-    }
-
-
     void RoundFunction(NTL::ZZ& input, const NTL::ZZ& key)
     {
         input ^= key;

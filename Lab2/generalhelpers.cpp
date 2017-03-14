@@ -67,4 +67,58 @@ namespace CryptoHelpers
         result |= (target & 0xF) ^ 0xF;
         return result;
     }
+
+    bool ConvertHexStringToLong(const std::string& source, NTL::ZZ& target)
+    {
+        target = 0;
+        NTL::ZZ power(1);
+        for(auto it = source.rbegin();it!=source.rend();++it)
+        {
+            auto digit = *it;
+            if(('0'<=digit)&&(digit<='9'))
+            {
+                target += power*static_cast<int>(digit - '0');
+            } else
+                if(('a' <= tolower(digit)) && (tolower(digit) <= 'f'))
+                {
+                    target += power*(static_cast<int>(tolower(digit) - 'a')+10);
+                }
+                else
+                    return false;
+            power *= 16;
+        }
+        return true;
+    }
+
+    bool GetRandom(NTL::ZZ& result)
+    {
+        result = std::move(NTL::RandomBits_ZZ(128));
+        return true;
+    }
+
+
+    void ReverseBytes(int bytesNumber, unsigned long long& value)
+    {
+        auto newValue = 0ull;
+        for (int i = 0; i<bytesNumber; ++i)
+        {
+            newValue <<= 8;
+            newValue |= value & 0xFF;
+            value >>= 8;
+        }
+        value = newValue;
+    }
+
+    void ReverseBytes(int bytesNumber, long long& value)
+    {
+        auto newValue = 0ull;
+        for (int i = 0; i<bytesNumber; ++i)
+        {
+            newValue <<= 8;
+            newValue |= value & 0xFF;
+            value >>= 8;
+        }
+        value = newValue;
+    }
+
 }

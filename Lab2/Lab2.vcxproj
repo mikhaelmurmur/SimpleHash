@@ -151,6 +151,7 @@
     <ClCompile Include="generalhelpers.cpp" />
     <ClCompile Include="hashing.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="signing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\WinNTLLib\WinNTLLib.vcxproj">
@@ -163,6 +164,7 @@
     <ClInclude Include="filereader.h" />
     <ClInclude Include="generalhelpers.h" />
     <ClInclude Include="hashing.h" />
+    <ClInclude Include="signing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

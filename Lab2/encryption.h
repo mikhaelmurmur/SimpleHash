@@ -12,4 +12,5 @@ namespace CryptoHelpers
     void Encrypt(const unsigned long long& source, unsigned long long& target, const unsigned long long* key = nullptr);
 
     void ResetKey();
+
 }
