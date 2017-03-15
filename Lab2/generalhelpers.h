@@ -19,4 +19,19 @@ namespace CryptoHelpers
     void ReverseBytes(int bytesNumber, long long& value);
 
     bool GetRandom(NTL::ZZ& result);
+
+    enum EWorkMode
+    {
+        Signing,
+        Checking
+    };
+
+    struct SCommandLineOptions
+    {
+        EWorkMode m_mode;
+        std::string m_filename;
+        std::string m_fileWithSignature;
+    };
+
+    void ConvertLongToString(const NTL::ZZ& source, std::string& target);
 }

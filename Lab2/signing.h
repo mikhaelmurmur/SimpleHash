@@ -7,5 +7,5 @@ namespace NTL {
 
 namespace CryptoHelpers
 {
-    bool Sign(const long long& hash, std::pair<NTL::ZZ, NTL::ZZ>& target);
+    bool Sign(const long long& hash, NTL::ZZ& signature, NTL::ZZ& y, NTL::ZZ& k, NTL::ZZ& g, NTL::ZZ& u, NTL::ZZ& z);
 }

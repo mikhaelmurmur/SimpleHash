@@ -96,6 +96,46 @@ namespace CryptoHelpers
         return true;
     }
 
+    void ConvertLongToString(const NTL::ZZ& _source, std::string& target)
+    {
+        target = "";
+        auto source = _source;
+        while(source>0)
+        {
+            unsigned char ch;
+            NTL::BytesFromZZ(&ch, source & 0xf, 1);
+            if(ch<10)
+            {
+                target += std::to_string(ch);
+            }
+            else
+            {
+                switch (ch)
+                {
+                case 10:
+                    target += 'a';
+                    break;
+                case 11:
+                    target += 'b';
+                    break;
+                case 12:
+                    target += 'c';
+                    break;
+                case 13:
+                    target += 'd';
+                    break;
+                case 14:
+                    target += 'e';
+                    break;
+                case 15:
+                    target += 'f';
+                    break;
+                }
+            }
+            source >>= 4;
+        }
+        std::reverse(target.begin(), target.end());
+    }
 
     void ReverseBytes(int bytesNumber, unsigned long long& value)
     {

@@ -18,7 +18,10 @@ namespace CryptoHelpers
         auto fileSize = file.tellg();
 
         data.resize(fileSize);
-
+        if(data.size()==0)
+        {
+            return true;
+        }
         file.seekg(0, std::ios::beg);
         file.read(static_cast<char*>(&data[0]), fileSize);
         file.close();
