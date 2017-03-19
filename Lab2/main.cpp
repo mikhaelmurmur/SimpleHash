@@ -4,8 +4,10 @@
 #include "hashing.h"
 #include "signing.h"
 #include <fstream>
+#include <sstream>
 
 int ProcessSinging(const CryptoHelpers::SCommandLineOptions& options);
+int ProcessChecking(const CryptoHelpers::SCommandLineOptions& options);
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +30,10 @@ int main(int argc, char *argv[])
     if(options.m_mode==CryptoHelpers::Signing)
     {
         ProcessSinging(options);
+    }
+    else
+    {
+        ProcessChecking(options);
     }
 }
 
@@ -60,7 +66,8 @@ int ProcessSinging(const CryptoHelpers::SCommandLineOptions& options)
     NTL::ZZ g(0);
     NTL::ZZ z(0);
     NTL::ZZ u(0);
-    CryptoHelpers::Sign(hashValue,signature,y,k,g,u,z);
+    NTL::ZZ x(0);
+    CryptoHelpers::Sign(hashValue,signature,y,k,g,u,z,x);
     std::string tmp;
     CryptoHelpers::ConvertLongToString(y, tmp);
     outputFile << "Y = " << tmp << std::endl; 
@@ -81,6 +88,79 @@ int ProcessSinging(const CryptoHelpers::SCommandLineOptions& options)
     CryptoHelpers::ConvertLongToString(g, tmp);
     outputadd << "G = " << tmp << std::endl;
     outputadd << "------------------------------\n";
+
+    return 0;
+}
+
+int ProcessChecking(const CryptoHelpers::SCommandLineOptions& options)
+{
+    std::vector<char> fileData;
+    if (!CryptoHelpers::ReadFile(options.m_filename, fileData))
+    {
+        return 1;
+    }
+
+    unsigned long long hashValue = 0;
+
+    if (fileData.size() != 0)
+    {
+        std::vector<unsigned long long> data;
+        CryptoHelpers::ConvertByteToLong(fileData, data);
+        CryptoHelpers::Hash(data, hashValue);
+    }
+
+
+    NTL::ZZ signature(0);
+    NTL::ZZ y(0);
+    NTL::ZZ k(0);
+    NTL::ZZ g(0);
+    NTL::ZZ z(0);
+    NTL::ZZ u(0);
+    NTL::ZZ x(0);
+    CryptoHelpers::Sign(hashValue, signature, y, k, g, u, z, x);
+
+    std::ifstream fileWithSignature(options.m_fileWithSignature);
+    std::string _tmp;
+    std::getline(fileWithSignature, _tmp);
+    std::getline(fileWithSignature, _tmp);
+    std::getline(fileWithSignature, _tmp);
+    _tmp = std::move(_tmp.substr(4, _tmp.size() - 4));
+    size_t fileHash = 0;
+    std::stringstream sstream;
+    sstream << std::hex << hashValue;
+    std::string _hashStr = sstream.str();
+
+
+    if (_tmp.compare(_hashStr)!=0)
+    {
+        std::cout << "Wrong hash value!\n";
+        return 2;
+    }
+
+
+    std::getline(fileWithSignature, _tmp);
+    _tmp = std::move(_tmp.substr(4, _tmp.size() - 4));
+    CryptoHelpers::ConvertHexStringToLong(_tmp, y);
+
+    std::getline(fileWithSignature, _tmp);
+    _tmp = std::move(_tmp.substr(4, _tmp.size() - 4));
+    CryptoHelpers::ConvertHexStringToLong(_tmp, k);
+
+    std::getline(fileWithSignature, _tmp);
+    _tmp = std::move(_tmp.substr(4, _tmp.size() - 4));
+    CryptoHelpers::ConvertHexStringToLong(_tmp, signature);
+
+
+    if(CryptoHelpers::CheckSignature(hashValue,signature,y,k))
+    {
+        std::cout << "Signature is correct!\n";
+    }
+    else
+    {
+        std::cout << "Signature is wrong!\n";
+    }
+
+
 
     return 0;
 }
